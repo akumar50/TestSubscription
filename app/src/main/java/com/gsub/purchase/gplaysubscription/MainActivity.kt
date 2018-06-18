@@ -31,12 +31,9 @@ class MainActivity : FragmentActivity(), BillingProvider, SendEmailResponse {
   private var mBillingManager: BillingManager? = null
   private var mAcquireFragment: AcquireFragment? = null
   private var mViewController: MainViewController? = null
-
   private var mScreenWait: View? = null
   private var mScreenMain:View? = null
-  //private ImageView mCarImageView;
   private var mGasImageView: ImageView? = null
-
   private var mButtonPurchase: View? = null
   private var mButtonDrive:View? = null
 

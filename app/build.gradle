@@ -31,7 +31,17 @@ android {
             signingConfig signingConfigs.release
         }
     }
-
+//    packagingOptions {
+//        exclude 'META-INF/DEPENDENCIES'
+//        exclude 'META-INF/LICENSE'
+//        exclude 'META-INF/LICENSE.txt'
+//        exclude 'META-INF/license.txt'
+//        exclude 'META-INF/NOTICE'
+//        exclude 'META-INF/NOTICE.txt'
+//        exclude 'META-INF/notice.txt'
+//        exclude 'META-INF/ASL2.0'
+//        exclude 'META-INF/INDEX.LIST'
+//    }
 }
 
 dependencies {
@@ -47,4 +57,7 @@ dependencies {
     implementation "com.android.support:support-annotations:27.1.1"
 
     implementation 'com.android.billingclient:billing:1.1'
+//    annotationProcessor 'com.google.cloud:google-cloud-pubsub:1.31.0'
+//    implementation 'com.google.cloud:google-cloud-pubsub:1.31.0'
+//    implementation 'com.google.cloud:google-cloud-storage:1.33.0'
 }

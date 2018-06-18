@@ -11,6 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchaseHistoryResponseListener
 import com.android.billingclient.api.SkuDetailsResponseListener
 import com.gsub.purchase.gplaysubscription.R
 
@@ -114,6 +116,20 @@ class AcquireFragment: DialogFragment() {
     val skus = mBillingProvider!!.billingManager.getSkus(BillingClient.SkuType.SUBS)
     mBillingProvider!!.billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, skus,
         responseListener)
+    mBillingProvider!!.billingManager.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS)
+    mBillingProvider!!.billingManager.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS_UPDATE)
+
+    mBillingProvider!!.billingManager.queryPurchases(BillingClient.SkuType.SUBS)
+    val purchaseHistoryResponseListener = PurchaseHistoryResponseListener { responseCode, purchaseHistoryList ->
+      if (responseCode == BillingClient.BillingResponse.OK && purchaseHistoryList != null) {
+        // Repacking the result for an adapter
+        for (purchase in purchaseHistoryList) {
+          Log.i(TAG, "purchaseHistoryList: $purchase")
+        }
+
+      }
+    }
+    mBillingProvider!!.billingManager.queryPurchaseHistoryAsync(BillingClient.SkuType.SUBS, purchaseHistoryResponseListener)
   }
 
   private fun displayAnErrorIfNeeded() {

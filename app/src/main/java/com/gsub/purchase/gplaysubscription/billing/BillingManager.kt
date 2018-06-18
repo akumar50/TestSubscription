@@ -4,15 +4,21 @@ import android.app.Activity
 import android.content.ContentValues
 import android.util.Log
 import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClient.BillingResponse
+import com.android.billingclient.api.BillingClient.FeatureType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchaseHistoryResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.SkuDetailsParams
 import com.android.billingclient.api.SkuDetailsResponseListener
 import com.gsub.purchase.gplaysubscription.MainActivity
+import com.gsub.purchase.gplaysubscription.skulist.GConstants
+import com.gsub.purchase.gplaysubscription.skulist.Security
 import java.util.Arrays
 import java.util.HashMap
+
 
 class BillingManager(mainActivity: MainActivity) : PurchasesUpdatedListener {
 
@@ -46,17 +52,16 @@ class BillingManager(mainActivity: MainActivity) : PurchasesUpdatedListener {
       }
     })
     val executeOnConnectedService = Runnable {
-      val billingFlowParams = BillingFlowParams.newBuilder()
-          .setType(billingType)
-          .setSku(skuId)
-          .build()
-//      val billingFlowParams = BillingFlowParams.newBuilder()
-//          .setSku(skuId)
-//          .setType(billingType)
-//          .setOldSku("sub4")
-//          .setReplaceSkusProrationMode(IMMEDIATE_WITHOUT_PRORATION)
-//          .build()
-      mBillingClient.launchBillingFlow(mActivity, billingFlowParams)
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setType(billingType)
+            .setSku(skuId)
+            .build()
+//        val billingFlowParams = BillingFlowParams.newBuilder()
+//            .setSku(skuId)
+//            .setType(billingType)
+//            .setOldSku("")
+//            .build()
+        mBillingClient.launchBillingFlow(mActivity, billingFlowParams)
     }
 
     // If Billing client was disconnected, we retry 1 time
@@ -64,12 +69,15 @@ class BillingManager(mainActivity: MainActivity) : PurchasesUpdatedListener {
     startServiceConnectionIfNeeded(executeOnConnectedService)
   }
 
+
+
   companion object {
     val skuDetails = HashMap<String, List<String>>()
   }
   init {
-    //skuDetails.put(BillingClient.SkuType.INAPP, Arrays.asList<String>("gas", "premium"))
-    skuDetails.put(BillingClient.SkuType.SUBS, Arrays.asList<String>("sub1", "sub2", "sub3", "sub4", "gold_premium","gold_monthly", "gold_yearly"))
+    skuDetails.put(BillingClient.SkuType.SUBS,
+        Arrays.asList<String>("cricut_weekly", "cricut_bronze", "cricut_silver",
+            "cricut_gold", "cricut_diamond", "cricut_premium", "cricut_seasonal"))
   }
 
   fun getSkus(@BillingClient.SkuType type: String): List<String> {
@@ -78,8 +86,13 @@ class BillingManager(mainActivity: MainActivity) : PurchasesUpdatedListener {
 
   override fun onPurchasesUpdated(responseCode: Int, purchases: List<Purchase>?) {
     Log.d(TAG, "onPurchasesUpdated() response: $responseCode $purchases")
-    if (responseCode == 0)
-      sendEmailResponse?.sendEmail(purchases)
+    if (responseCode == BillingClient.BillingResponse.OK) {
+      if (purchases != null) {
+        for (purchase in purchases) {
+          handlePurchase(purchase)
+        }
+      }
+    }
   }
 
   fun querySkuDetailsAsync(@BillingClient.SkuType itemType: String,
@@ -96,6 +109,25 @@ class BillingManager(mainActivity: MainActivity) : PurchasesUpdatedListener {
 
     // If Billing client was disconnected, we retry 1 time and if success, execute the query
     startServiceConnectionIfNeeded(executeOnConnectedService)
+  }
+
+  fun isFeatureSupported(@FeatureType featureType: String) {
+    val supported = mBillingClient.isFeatureSupported(featureType)
+    Log.d("purchaseSupported : ", ""+supported)
+  }
+
+  fun queryPurchases(@BillingClient.SkuType itemType: String){
+    val queryPurchase = mBillingClient.queryPurchases(itemType)
+    if (queryPurchase.getResponseCode() == BillingResponse.OK) {
+      if(queryPurchase.getPurchasesList()!=null && queryPurchase.getPurchasesList()!=null){
+        Log.d("purchaseQuery : ", ""+queryPurchase.purchasesList)
+      }
+    }
+  }
+
+  fun queryPurchaseHistoryAsync(@BillingClient.SkuType itemType: String,
+      listener: PurchaseHistoryResponseListener) {
+    mBillingClient.queryPurchaseHistoryAsync(itemType, listener)
   }
 
   private fun startServiceConnectionIfNeeded(executeOnSuccess: Runnable?) {
@@ -125,6 +157,17 @@ class BillingManager(mainActivity: MainActivity) : PurchasesUpdatedListener {
 
   interface SendEmailResponse {
     fun sendEmail(purchases: List<Purchase>?)
+  }
+
+  private fun handlePurchase(purchase: Purchase) {
+    if (!verifyValidSignature(purchase.originalJson, purchase.signature)) {
+      return
+    }
+  }
+
+  private fun verifyValidSignature(signedData: String, signature: String): Boolean {
+    return Security.verifyPurchase(GConstants.GPLAY_BILLING_LINCENCE, signedData,
+        signature)
   }
 
 }

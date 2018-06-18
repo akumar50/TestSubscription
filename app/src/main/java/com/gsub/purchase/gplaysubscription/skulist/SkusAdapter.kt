@@ -13,10 +13,6 @@ class SkusAdapter(mBillingProvider: BillingProvider?) : RecyclerView.Adapter<Row
   private var mListData: List<SkuRowData>? = null
   private var mBillingProvider: BillingProvider? = mBillingProvider
 
-//  fun SkusAdapter(billingProvider: BillingProvider) {
-//    this@SkusAdapter.mBillingProvider = billingProvider
-//  }
-
   internal fun updateData(data: List<SkuRowData>) {
     mListData = data
     notifyDataSetChanged()
@@ -37,9 +33,8 @@ class SkusAdapter(mBillingProvider: BillingProvider?) : RecyclerView.Adapter<Row
       holder.button?.setEnabled(true)
     }
     when (data!!.sku) {
-      "gas" -> holder.skuIcon.setImageResource(R.drawable.gas_icon)
-      "premium" -> holder.skuIcon.setImageResource(R.drawable.premium_icon)
-      "sub1", "sub2","sub3", "sub4","gold_premium","gold_monthly", "gold_yearly" -> holder.skuIcon.setImageResource(R.drawable.gold_icon)
+      "cricut_weekly", "cricut_bronze", "cricut_silver", "cricut_gold", "cricut_diamond",
+      "cricut_premium", "cricut_seasonal" -> holder.skuIcon.setImageResource(R.drawable.gold_icon)
     }
   }
 

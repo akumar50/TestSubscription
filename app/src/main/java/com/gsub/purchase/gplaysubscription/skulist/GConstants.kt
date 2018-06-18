@@ -1,0 +1,7 @@
+package com.gsub.purchase.gplaysubscription.skulist
+
+interface GConstants {
+  companion object {
+    val GPLAY_BILLING_LINCENCE = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo3rj+IRS2Ei27foqY0utyQWeacr9zpNEj6/feFH6ExkwwlOQmLZJ9gDGLdDTnenvtPBqgotQFJJljlQf7E61J78oMbgMkcN17z/IHRQXbYfylPldMgyCvlNATVhyxaS/Dcx5xdLHk8SVr546GHGJHLf1VrfYY2OUJlNH7osNKmKfTxXUD+k7OqDsQylI808Z9mewEdwK0VU6cMVZcOaHmnESdMIGbKjYB6R+RJ6zejnTqrheQtXWd7MS4uHSwPQAPw59Kt1I+J1aEuQX2XJSyYpc9S7MpqILi2IggR+kDGgh4PNVD/FYK0ZdnofyUn6hV1DXY2DhiLqq/2BSp5wluwIDAQAB"
+  }
+}
